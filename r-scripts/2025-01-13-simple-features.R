@@ -9,6 +9,7 @@ source('r-scripts/default-ggplot-theme.R')
 ubco <- st_as_sf(data.frame(long = -119.39466, lat = 49.93949),
                  coords = c('long', 'lat'))
 plot(ubco)
+plot(ubco, axes = TRUE)
 
 # line data
 kelowna_roads <- read_sf('data/kelowna-roads/Road.shp')
@@ -19,12 +20,13 @@ plot(st_geometry(kelowna_roads))
 # polygon of Kelowna from https://opendata.kelowna.ca/datasets/751a41f3ad0840ab80ba8d30090ae4eb_9/explore
 kelowna_polygon <- read_sf('data/kelowna-shapefile/City_Boundary.shp')
 plot(kelowna_polygon)
-plot(st_geometry(kelowna_polygon))
+kelowna_polygon <- st_geometry(kelowna_polygon)
+plot(kelowna_polygon)
 
 # plot all three together 
-plot(st_geometry(kelowna_polygon), col = 'grey80')
+plot(kelowna_polygon, col = 'grey90')
 plot(st_geometry(kelowna_roads), add = TRUE, col = 'black')
-plot(ubco, add = TRUE, col = c('red'), pch = 19)
+plot(ubco, add = TRUE, col = 'red', pch = 19) # does not plot?
 
 # check each object's projection
 st_crs(kelowna_polygon)
@@ -37,8 +39,7 @@ st_crs(ubco)
 
 # reproject the point
 ubco <- st_transform(ubco, crs = st_crs(kelowna_roads))
-plot(ubco, add = TRUE, col = c('black'), pch = 19, cex = 2)
-plot(ubco, add = TRUE, col = c('red'), pch = 19)
+plot(ubco, add = TRUE, col = 'red2', pch = 19, cex = 1)
 
 # polygon of Canada
 bc <- filter(PROV, PT == 'BC') %>%
@@ -60,9 +61,12 @@ HR %>%
   summarise(g = st_geometry(geometry) %>%
               st_make_valid() %>%
               st_union()) %>%
-  plot()
+  plot(key.pos = 3) # legend on top
 
 # buffer the HR polygons before union to ensure overlap
+# removes broken lines inside each province/territory
+# not the cleanest way of fixing the issue, but it works if the buffering
+# scale is negligible, relatie to your scale of interest
 HR %>%
   group_by(PRNAME) %>%
   summarise(g = st_geometry(geometry) %>%
@@ -82,7 +86,40 @@ HR %>%
   plot()
 
 # plotting simple features in ggplot ----
+# MOTI = ministry of transport and and infrastructure
 ggplot() +
-  geom_sf(data = kelowna_polygon) +
-  geom_sf(data = kelowna_roads, color = 'black', alpha = 0.8) +
-  geom_sf(data = ubco, color = 'red', size = 2)
+  geom_sf(data = kelowna_polygon, fill = 'grey95', color = 'black') +
+  geom_sf(aes(color = road_class, linewidth = road_class), kelowna_roads) +
+  geom_sf(data = ubco, color = 'black', size = 2, alpha = 0.75) +
+  scale_color_manual(values = c(Arterial = '#EE6677',
+                                Local = 'black',
+                                MajorCollector = '#228833',
+                                MinorCollector = '#CCBB44',
+                                MOTI = '#66CCEE',
+                                Strata = '#AA3377'),
+                     na.value = 'darkorange', name = 'Road type') +
+  scale_linewidth_manual(values = c(Arterial = 0.75,
+                                    Local = 0.25,
+                                    MajorCollector = 0.75,
+                                    MinorCollector = 0.5,
+                                    MOTI = 1,
+                                    Strata = 0.25),
+                         na.value = 0.25, name = 'Road type')
+
+# can work with sf objects just like any tibble/dataframe
+major_ways <- filter(kelowna_roads, road_class != 'Local')
+
+ggplot() +
+  geom_sf(data = kelowna_polygon, fill = 'grey95', color = 'black') +
+  geom_sf(aes(color = road_class, linewidth = road_class), major_ways) +
+  geom_sf(data = ubco, color = 'black', size = 2, alpha = 0.75) +
+  scale_color_manual(values = c(Arterial = '#EE6677',
+                                MajorCollector = '#228833',
+                                MinorCollector = '#CCBB44',
+                                MOTI = '#66CCEE',
+                                Strata = '#AA3377'), name = 'Road type') +
+  scale_linewidth_manual(values = c(Arterial = 0.75,
+                                    MajorCollector = 0.75,
+                                    MinorCollector = 0.5,
+                                    MOTI = 1,
+                                    Strata = 0.25), name = 'Road type')
