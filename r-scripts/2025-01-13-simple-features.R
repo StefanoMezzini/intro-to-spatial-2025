@@ -111,7 +111,9 @@ ggplot() +
                          na.value = 0.25, name = 'Road type')
 
 # can work with sf objects just like any tibble/dataframe
-major_ways <- filter(kelowna_roads, road_class != 'Local')
+major_ways <- filter(kelowna_roads,
+                     road_class != 'Local',
+                     road_class != 'Strata')
 
 ggplot() +
   geom_sf(data = kelowna_polygon, fill = 'grey95', color = 'black') +
