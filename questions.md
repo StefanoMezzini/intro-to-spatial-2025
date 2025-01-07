@@ -3,3 +3,4 @@
 - I would be most interested in spatial clustering methods
 - Tips on efficient data/code management would also be nice to include in this workshop. Thanks!
 - Lecture slides and materials needed for the workshop and used during the workshop to be provided prior to the workshop to be prepared for the workshop please.
+- What is the difference plotting spatial data using R and GIS? What are the benefits using R?

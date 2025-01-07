@@ -1,3 +1,7 @@
+# questions not addressed in the scripts:
+# - tips on efficient data/code management
+# - plotting using R vs GIS; benefits of using R
+
 library('sf')           # for simple features (points, lines, polygons)
 library('canadianmaps') # for shapefile of Canada
 library('dplyr')        # for data wrangling
