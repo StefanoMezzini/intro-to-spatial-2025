@@ -34,8 +34,11 @@ crs(ndvi) # terra function
 # w kelowna shapefile CRS
 layout(1:2)
 plot(ndvi[[1]], col = ndvi_pal, range = c(-1, 1), main = 'Long-Lat projection')
+plot(okanagan_lake, add = TRUE) # does not show up if CRS is different
+
 project(ndvi[[1]], crs(kelowna_polygon)) %>%
   plot(col = ndvi_pal, range = c(-1, 1), main = 'UTM zone 11N projection')
+plot(okanagan_lake, add = TRUE) # shows up if same CRS
 layout(1)
 
 # cropping rasters ----
@@ -101,6 +104,7 @@ plot(yearly_means$raster[[1]], col = ndvi_pal, range = c(-1, 1))
 plot(yearly_means$raster[[2]], col = ndvi_pal, range = c(-1, 1))
 plot(yearly_means$raster[[3]], col = ndvi_pal, range = c(-1, 1))
 
+# smooth, spatiotemporal estimates are better than point estimates
 # see https://events.ok.ubc.ca/series/fitting-models-to-data-not-data-to-models-workshop-series/
 
 # calculate distance from features ----
