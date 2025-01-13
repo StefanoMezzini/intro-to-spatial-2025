@@ -43,6 +43,7 @@ st_crs(ubco)
 
 # reproject the point
 ubco <- st_transform(ubco, crs = st_crs(kelowna_roads))
+st_crs(ubco)
 plot(ubco, add = TRUE, col = 'red2', pch = 19, cex = 1)
 
 # polygon of Canada
@@ -78,7 +79,7 @@ HR %>%
               st_buffer(1e3) %>% # buffer by 1 km to avoid lines
               st_union()) %>%
   st_buffer(-1e3) %>% # reverse the buffering for an approximate fix
-  plot()
+  plot(key.pos = 3)
 
 # what happens if we buffer too much and don't fix it
 HR %>%
@@ -128,4 +129,17 @@ ggplot() +
                                     MajorCollector = 0.75,
                                     MinorCollector = 0.5,
                                     MOTI = 1,
-                                    Strata = 0.25), name = 'Road type')
+                                    Strata = 0.25), name = 'Road type') +
+  labs(title = 'Kelowna roadways', x = 'Longintude', y = 'Latitude') +
+  theme(legend.position = 'inside', legend.position.inside = c(0.2, 0.8),
+        legend.background = element_rect(color = 'black')) +
+  # adding a north arrow for reference
+  ggspatial::annotation_north_arrow(
+    location = "tr", which_north = "true",
+    pad_x = unit(0.4, "in"), pad_y = unit(0.4, "in"),
+    style = ggspatial::north_arrow_nautical(
+      fill = c("grey40", "white"),
+      line_col = "grey20",
+      text_family = "ArcherPro Book"
+    )
+  )
